@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Loan Calculator & Comparison Tool</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            padding: 40px;
+            margin: 60px auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #6e6e73;
+            margin: 10px 0 5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            background-color: #f2f2f7;
+            font-size: 16px;
+            color: #1d1d1f;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #0071e3;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .checkbox-container input {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #0071e3;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        .output {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e5ea;
+            font-size: 16px;
+            color: #1d1d1f;
+        }
+
+        .output p {
+            margin: 10px 0;
+        }
+
+        .output h2 {
+            color: #0071e3;
+        }
+
+        .bold-black {
+            color: #000;
+            font-weight: bold;
+        }
+
+        .bold-red {
+            color: red;
+            font-weight: bold;
+        }
+
+        .bold-dark {
+            color: #444;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .comparison-section {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .comparison-section .comparison {
+            flex: 1;
+        }
+
+        .comparison-section label {
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        table th {
+            background-color: #0071e3;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            input[type="number"] {
+                font-size: 18px;
+            }
+
+            button {
+                font-size: 18px;
+                padding: 16px;
+            }
+
+            .comparison-section {
+                flex-direction: column;
+            }
+
+            .comparison {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Loan Calculator & Comparison Tool</h1>
+
+        <!-- Car MSRP input -->
+        <label for="msrp">Car MSRP Price</label>
+        <input type="number" id="msrp" placeholder="Enter MSRP price" oninput="calculateSalesTaxAndLoanAmount()">
+
+        <!-- Sales Tax (calculated automatically) -->
+        <label for="salesTax">Sales Tax Amount (6.25% in Houston, TX)</label>
+        <input type="number" id="salesTax" readonly>
+
+        <!-- Loan amount (calculated automatically) -->
+        <label for="loanAmount">Total Loan Amount (MSRP + Sales Tax)</label>
+        <input type="number" id="loanAmount" readonly>
+
+        <!-- Down Payment (optional) -->
+        <label for="downPayment">Down Payment (optional)</label>
+        <input type="number" id="downPayment" placeholder="Enter down payment (if any)">
+
+        <!-- Loan inputs -->
+        <label for="interestRate1">Interest Rate (%)</label>
+        <input type="number" id="interestRate1" placeholder="Enter interest rate">
+
+        <label for="loanTerm1">Loan Term (months)</label>
+        <input type="number" id="loanTerm1" placeholder="Enter loan term in months">
+
+        <!-- Comparison section -->
+        <div class="checkbox-container">
+            <input type="checkbox" id="comparisonCheckbox" onclick="toggleComparison()">
+            <label for="comparisonCheckbox">Compare with additional loans?</label>
+        </div>
+
+        <div id="comparisonSection" class="hidden">
+            <label for="numberOfComparisons">How many comparisons?</label>
+            <input type="number" id="numberOfComparisons" placeholder="Enter number of comparisons (1-3)" oninput="generateComparisonFields()">
+        </div>
+
+        <!-- Dynamic comparison input fields -->
+        <div id="dynamicComparisonFields" class="comparison-section"></div>
+
+        <!-- Refinance section -->
+        <div class="checkbox-container">
+            <input type="checkbox" id="refinanceCheckbox" onclick="toggleRefinance()">
+            <label for="refinanceCheckbox">Refinance after a certain period?</label>
+        </div>
+
+        <div id="refinanceSection" class="hidden">
+            <label for="refinanceMonths">Months before refinance</label>
+            <input type="number" id="refinanceMonths" placeholder="Enter months before refinancing">
+
+            <label for="newInterestRate">New Interest Rate (%)</label>
+            <input type="number" id="newInterestRate" placeholder="Enter new interest rate after refinancing">
+
+            <label for="newLoanTerm">New Loan Term (months)</label>
+            <input type="number" id="newLoanTerm" placeholder="Enter new loan term after refinancing">
+        </div>
+
+        <button onclick="calculate()">Calculate</button>
+
+        <div class="output hidden" id="output"></div>
+    </div>
+
+    <script>
+        // Function to calculate sales tax and loan amount
+        function calculateSalesTaxAndLoanAmount() {
+            const msrp = parseFloat(document.getElementById("msrp").value) || 0;
+            const salesTaxRate = 6.25;
+            const salesTax = msrp * (salesTaxRate / 100);
+            const loanAmount = msrp + salesTax;
+
+            document.getElementById("salesTax").value = salesTax.toFixed(2);
+            document.getElementById("loanAmount").value = loanAmount.toFixed(2);
+        }
+
+        // Function to toggle comparison section
+        function toggleComparison() {
+            const comparisonSection = document.getElementById("comparisonSection");
+            const dynamicFields = document.getElementById("dynamicComparisonFields");
+            if (document.getElementById("comparisonCheckbox").checked) {
+                comparisonSection.classList.remove("hidden");
+                dynamicFields.innerHTML = ""; // Clear the fields
+            } else {
+                comparisonSection.classList.add("hidden");
+                dynamicFields.innerHTML = "";
+            }
+        }
+
+        // Function to generate comparison input fields
+        function generateComparisonFields() {
+            const numComparisons = parseInt(document.getElementById("numberOfComparisons").value) || 0;
+            const dynamicFields = document.getElementById("dynamicComparisonFields");
+            dynamicFields.innerHTML = "";
+
+            for (let i = 1; i <= numComparisons; i++) {
+                const div = document.createElement("div");
+                div.className = "comparison";
+
+                div.innerHTML = `
+                    <h2>Comparison ${i}</h2>
+                    <label for="interestRate${i + 1}">Interest Rate (%)</label>
+                    <input type="number" id="interestRate${i + 1}" placeholder="Enter interest rate">
+
+                    <label for="loanTerm${i + 1}">Loan Term (months)</label>
+                    <input type="number" id="loanTerm${i + 1}" placeholder="Enter loan term in months">
+                `;
+
+                dynamicFields.appendChild(div);
+            }
+        }
+
+        // Function to toggle refinance section
+        function toggleRefinance() {
+            const refinanceSection = document.getElementById("refinanceSection");
+            if (document.getElementById("refinanceCheckbox").checked) {
+                refinanceSection.classList.remove("hidden");
+            } else {
+                refinanceSection.classList.add("hidden");
+            }
+        }
+
+        // Function to calculate loan details
+        function calculate() {
+            const msrp = parseFloat(document.getElementById("msrp").value) || 0;
+            const downPayment = parseFloat(document.getElementById("downPayment").value) || 0;
+            const loanAmountFinanced = parseFloat(document.getElementById("loanAmount").value) - downPayment;
+            const interestRate = parseFloat(document.getElementById("interestRate1").value) || 0;
+            const loanTerm = parseInt(document.getElementById("loanTerm1").value) || 0;
+
+            // Monthly payment formula
+            const monthlyInterestRate = (interestRate / 100) / 12;
+            const monthlyPayment = loanAmountFinanced * monthlyInterestRate / (1 - Math.pow(1 + monthlyInterestRate, -loanTerm));
+            const totalInterestCharge = (monthlyPayment * loanTerm) - loanAmountFinanced;
+
+            const outputDiv = document.getElementById("output");
+            outputDiv.classList.remove("hidden");
+
+            // Base loan calculation results
+            let resultHTML = `
+                <h2>Results</h2>
+                <p>Total Loan Amount Requested: $${msrp.toFixed(2)}</p>
+                <p>Total Down Payment: $${downPayment.toFixed(2)}</p>
+                <p>Loan Amount Financed: $${loanAmountFinanced.toFixed(2)}</p>
+                <p>Interest Rate: ${interestRate.toFixed(2)}%</p>
+                <p><span class="bold-black">Monthly Payment: $${monthlyPayment.toFixed(2)}</span></p>
+                <p><span class="bold-red">Total Interest Charge: $${totalInterestCharge.toFixed(2)}</span></p>
+            `;
+
+            // Add comparison results if any
+            if (document.getElementById("comparisonCheckbox").checked) {
+                const numComparisons = parseInt(document.getElementById("numberOfComparisons").value) || 0;
+                if (numComparisons > 0) {
+                    resultHTML += `<h2>Comparison Results</h2><div class="comparison-section">`;
+
+                    for (let i = 1; i <= numComparisons; i++) {
+                        const interestRateComp = parseFloat(document.getElementById(`interestRate${i + 1}`).value) || 0;
+                        const loanTermComp = parseInt(document.getElementById(`loanTerm${i + 1}`).value) || 0;
+                        const monthlyInterestRateComp = (interestRateComp / 100) / 12;
+                        const monthlyPaymentComp = loanAmountFinanced * monthlyInterestRateComp / (1 - Math.pow(1 + monthlyInterestRateComp, -loanTermComp));
+                        const totalInterestChargeComp = (monthlyPaymentComp * loanTermComp) - loanAmountFinanced;
+
+                        resultHTML += `
+                            <div class="comparison">
+                                <h3>Comparison ${i}</h3>
+                                <p>Interest Rate: ${interestRateComp.toFixed(2)}%</p>
+                                <p>Loan Term: ${loanTermComp} months</p>
+                                <p><span class="bold-black">Monthly Payment: $${monthlyPaymentComp.toFixed(2)}</span></p>
+                                <p><span class="bold-red">Total Interest Charge: $${totalInterestChargeComp.toFixed(2)}</span></p>
+                            </div>
+                        `;
+                    }
+
+                    resultHTML += `</div>`;
+                }
+            }
+
+            // Add refinance results if any
+            if (document.getElementById("refinanceCheckbox").checked) {
+                const refinanceMonths = parseInt(document.getElementById("refinanceMonths").value) || 0;
+                const newInterestRate = parseFloat(document.getElementById("newInterestRate").value) || 0;
+                const newLoanTerm = parseInt(document.getElementById("newLoanTerm").value) || 0;
+
+                const monthlyInterestRateRefinance = (newInterestRate / 100) / 12;
+                const remainingBalance = loanAmountFinanced * (Math.pow(1 + monthlyInterestRate, loanTerm) - Math.pow(1 + monthlyInterestRate, refinanceMonths)) / (Math.pow(1 + monthlyInterestRate, loanTerm) - 1);
+                const monthlyPaymentRefinance = remainingBalance * monthlyInterestRateRefinance / (1 - Math.pow(1 + monthlyInterestRateRefinance, -newLoanTerm));
+                const totalInterestChargeRefinance = (monthlyPaymentRefinance * newLoanTerm) - remainingBalance;
+
+                const interestSavedOrExtra = totalInterestCharge - totalInterestChargeRefinance;
+
+                resultHTML += `
+                    <h2>Refinance Results</h2>
+                    <p>Months before refinance: ${refinanceMonths}</p>
+                    <p>New Interest Rate: ${newInterestRate.toFixed(2)}%</p>
+                    <p>New Loan Term: ${newLoanTerm} months</p>
+                    <p><span class="bold-black">New Monthly Payment: $${monthlyPaymentRefinance.toFixed(2)}</span></p>
+                    <p><span class="bold-red">New Total Interest Charge: $${totalInterestChargeRefinance.toFixed(2)}</span></p>
+                    <p><span class="bold-dark">Interest Saved/Extra: $${interestSavedOrExtra.toFixed(2)}</span></p>
+                `;
+            }
+
+            // Render the results
+            outputDiv.innerHTML = resultHTML;
+        }
+    </script>
+
+</body>
+</html>
