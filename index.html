@@ -63,9 +63,31 @@
             border: 1px solid #e5e5ea;
             font-size: 16px;
             color: #1d1d1f;
-            display: none; /* Start as hidden */
+            display: none;
+        }
+        .comparison-section {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .comparison {
+            flex: 1;
+            min-width: 200px;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         .highlight {
+            color: red;
+            font-weight: bold;
+        }
+        .highlight-positive {
+            color: blue;
+            font-weight: bold;
+        }
+        .highlight-negative {
             color: red;
             font-weight: bold;
         }
@@ -75,30 +97,75 @@
     <div class="container">
         <h1>Loan Calculator & Comparison Tool</h1>
 
-        <!-- Car MSRP input -->
+        <!-- Inputs for Loan Calculator -->
         <label for="msrp">Car MSRP Price</label>
         <input type="number" id="msrp" placeholder="Enter MSRP price" oninput="calculateSalesTaxAndTotalPrice()">
 
-        <!-- State-based Sales Tax Dropdown -->
         <label for="state">Select State</label>
         <select id="state" onchange="updateSalesTaxRate()">
-            <option value="">Select your state</option>
-            <option value="4.00">Alabama - 4.00%</option>
-            <!-- Add other states as needed -->
-        </select>
+    <option value="">Select your state</option>
+    <option value="4.00">Alabama - 4.00%</option>
+    <option value="0.00">Alaska - 0.00%</option>
+    <option value="5.60">Arizona - 5.60%</option>
+    <option value="6.50">Arkansas - 6.50%</option>
+    <option value="7.25">California - 7.25%</option>
+    <option value="2.90">Colorado - 2.90%</option>
+    <option value="6.35">Connecticut - 6.35%</option>
+    <option value="0.00">Delaware - 0.00%</option>
+    <option value="6.00">Florida - 6.00%</option>
+    <option value="4.00">Georgia - 4.00%</option>
+    <option value="4.00">Hawaii - 4.00%</option>
+    <option value="6.00">Idaho - 6.00%</option>
+    <option value="6.25">Illinois - 6.25%</option>
+    <option value="7.00">Indiana - 7.00%</option>
+    <option value="6.00">Iowa - 6.00%</option>
+    <option value="6.50">Kansas - 6.50%</option>
+    <option value="6.00">Kentucky - 6.00%</option>
+    <option value="4.45">Louisiana - 4.45%</option>
+    <option value="5.50">Maine - 5.50%</option>
+    <option value="6.00">Maryland - 6.00%</option>
+    <option value="6.25">Massachusetts - 6.25%</option>
+    <option value="6.00">Michigan - 6.00%</option>
+    <option value="6.88">Minnesota - 6.88%</option>
+    <option value="7.00">Mississippi - 7.00%</option>
+    <option value="4.23">Missouri - 4.23%</option>
+    <option value="0.00">Montana - 0.00%</option>
+    <option value="5.50">Nebraska - 5.50%</option>
+    <option value="6.85">Nevada - 6.85%</option>
+    <option value="0.00">New Hampshire - 0.00%</option>
+    <option value="6.63">New Jersey - 6.63%</option>
+    <option value="5.13">New Mexico - 5.13%</option>
+    <option value="4.00">New York - 4.00%</option>
+    <option value="4.75">North Carolina - 4.75%</option>
+    <option value="5.00">North Dakota - 5.00%</option>
+    <option value="5.75">Ohio - 5.75%</option>
+    <option value="4.50">Oklahoma - 4.50%</option>
+    <option value="0.00">Oregon - 0.00%</option>
+    <option value="6.00">Pennsylvania - 6.00%</option>
+    <option value="7.00">Rhode Island - 7.00%</option>
+    <option value="6.00">South Carolina - 6.00%</option>
+    <option value="4.50">South Dakota - 4.50%</option>
+    <option value="7.00">Tennessee - 7.00%</option>
+    <option value="6.25">Texas - 6.25%</option>
+    <option value="4.85">Utah - 4.85%</option>
+    <option value="6.00">Vermont - 6.00%</option>
+    <option value="5.30">Virginia - 5.30%</option>
+    <option value="6.50">Washington - 6.50%</option>
+    <option value="6.00">West Virginia - 6.00%</option>
+    <option value="5.00">Wisconsin - 5.00%</option>
+    <option value="4.00">Wyoming - 4.00%</option>
+</select>
 
-        <!-- Sales Tax and Total Car Price -->
+
         <input type="hidden" id="salesTaxRate" value="">
         <label for="salesTax">Sales Tax Amount</label>
         <input type="number" id="salesTax" readonly>
         <label for="totalCarPrice">Total Car Price (MSRP + Sales Tax)</label>
         <input type="number" id="totalCarPrice" readonly>
 
-        <!-- Down Payment (optional) -->
         <label for="downPayment">Down Payment (optional)</label>
         <input type="number" id="downPayment" placeholder="Enter down payment (if any)">
 
-        <!-- Loan inputs -->
         <label for="interestRate">Interest Rate (%)</label>
         <input type="number" id="interestRate" placeholder="Enter interest rate">
 
@@ -117,6 +184,23 @@
             <div id="dynamicComparisonFields" class="comparison-section"></div>
         </div>
 
+        <!-- Refinance Checkbox and Inputs -->
+        <div>
+            <input type="checkbox" id="refinanceCheckbox" onclick="toggleRefinance()">
+            <label for="refinanceCheckbox">Refinance after a certain period?</label>
+        </div>
+
+        <div id="refinanceSection" style="display: none;">
+            <label for="refinanceMonths">Months before refinance</label>
+            <input type="number" id="refinanceMonths" placeholder="Enter months before refinancing">
+
+            <label for="newInterestRate">New Interest Rate (%)</label>
+            <input type="number" id="newInterestRate" placeholder="Enter new interest rate after refinancing">
+
+            <label for="newLoanTerm">New Loan Term (months)</label>
+            <input type="number" id="newLoanTerm" placeholder="Enter new loan term after refinancing">
+        </div>
+
         <button onclick="calculate()">Calculate</button>
 
         <!-- Original Loan Output -->
@@ -124,6 +208,9 @@
 
         <!-- Comparison Results -->
         <div class="comparison-output" id="comparisonOutput"></div>
+
+        <!-- Refinancing Results -->
+        <div class="refinance-output" id="refinanceOutput"></div>
     </div>
 
     <script>
@@ -156,6 +243,11 @@
             document.getElementById("dynamicComparisonFields").innerHTML = "";
         }
 
+        function toggleRefinance() {
+            const refinanceSection = document.getElementById("refinanceSection");
+            refinanceSection.style.display = document.getElementById("refinanceCheckbox").checked ? "block" : "none";
+        }
+
         function generateComparisonFields() {
             const numComparisons = parseInt(document.getElementById("numberOfComparisons").value) || 0;
             const dynamicFields = document.getElementById("dynamicComparisonFields");
@@ -181,8 +273,10 @@
         function calculate() {
             document.getElementById("output").innerHTML = "";
             document.getElementById("comparisonOutput").innerHTML = "";
+            document.getElementById("refinanceOutput").innerHTML = "";
             document.getElementById("output").style.display = "none";
             document.getElementById("comparisonOutput").style.display = "none";
+            document.getElementById("refinanceOutput").style.display = "none";
 
             const totalCarPrice = parseFloat(document.getElementById("totalCarPrice").value) || 0;
             const downPayment = parseFloat(document.getElementById("downPayment").value) || 0;
@@ -201,7 +295,8 @@
                 const numComparisons = parseInt(document.getElementById("numberOfComparisons").value) || 0;
                 if (numComparisons > 0) {
                     const comparisonOutputDiv = document.getElementById("comparisonOutput");
-                    comparisonOutputDiv.style.display = "block";
+                    comparisonOutputDiv.classList.add("comparison-section");
+                    comparisonOutputDiv.style.display = "flex";
 
                     for (let i = 1; i <= numComparisons; i++) {
                         const downPaymentComp = parseFloat(document.getElementById(`downPayment${i}`).value) || 0;
@@ -210,6 +305,17 @@
 
                         displayLoanResults(totalCarPrice, downPaymentComp, interestRateComp, loanTermComp, `Comparison ${i}`, "comparisonOutput");
                     }
+                }
+            }
+
+            const refinanceCheckbox = document.getElementById("refinanceCheckbox").checked;
+            if (refinanceCheckbox) {
+                const refinanceMonths = parseFloat(document.getElementById("refinanceMonths").value) || 0;
+                const newInterestRate = parseFloat(document.getElementById("newInterestRate").value) || 0;
+                const newLoanTerm = parseFloat(document.getElementById("newLoanTerm").value) || 0;
+
+                if (refinanceMonths && newInterestRate && newLoanTerm) {
+                    calculateRefinance(totalCarPrice, downPayment, interestRate, loanTerm, refinanceMonths, newInterestRate, newLoanTerm);
                 }
             }
         }
@@ -221,7 +327,7 @@
             const totalInterest = (monthlyPayment * loanTerm) - totalLoan;
 
             const outputDiv = document.getElementById(containerId);
-            outputDiv.style.display = "block";
+            outputDiv.style.display = "flex";
 
             outputDiv.innerHTML += `
                 <div class="comparison">
@@ -233,6 +339,43 @@
                 </div>
             `;
         }
+
+        function calculateRefinance(totalCarPrice, downPayment, originalRate, originalTerm, refinanceMonths, newRate, newTerm) {
+            const principal = totalCarPrice - downPayment;
+            const monthlyOriginalRate = (originalRate / 100) / 12;
+            const monthlyOriginalPayment = (principal * monthlyOriginalRate) / (1 - Math.pow(1 + monthlyOriginalRate, -originalTerm));
+            
+            // Calculate remaining balance after refinancing period
+            const balanceAfterRefinance = principal * Math.pow(1 + monthlyOriginalRate, refinanceMonths) - 
+                (monthlyOriginalPayment * (Math.pow(1 + monthlyOriginalRate, refinanceMonths) - 1) / monthlyOriginalRate);
+            
+            // New loan terms after refinancing
+            const monthlyNewRate = (newRate / 100) / 12;
+            const newMonthlyPayment = (balanceAfterRefinance * monthlyNewRate) / (1 - Math.pow(1 + monthlyNewRate, -newTerm));
+            
+            // Total interest for the remaining original loan
+            const interestPaidTillRefinance = (monthlyOriginalPayment * refinanceMonths) - (principal - balanceAfterRefinance);
+            
+            // Total interest for the new loan after refinancing
+            const totalNewInterest = (newMonthlyPayment * newTerm) - balanceAfterRefinance;
+            
+            // Total interest if the loan was not refinanced
+            const totalOriginalInterest = (monthlyOriginalPayment * originalTerm) - principal;
+            
+            // Calculate total interest saved
+            const interestSaved = totalOriginalInterest - (interestPaidTillRefinance + totalNewInterest);
+
+            const refinanceOutputDiv = document.getElementById("refinanceOutput");
+            refinanceOutputDiv.style.display = "block";
+            refinanceOutputDiv.innerHTML = `
+                <h2>Refinancing Results</h2>
+                <p><strong>Remaining Balance after ${refinanceMonths} months:</strong> $${balanceAfterRefinance.toFixed(2)}</p>
+                <p><strong>New Monthly Payment:</strong> $${newMonthlyPayment.toFixed(2)}</p>
+                <p><strong>Total Interest on New Loan:</strong> $${totalNewInterest.toFixed(2)}</p>
+                <p><strong>Interest Saved from Refinancing:</strong> <span class="${interestSaved >= 0 ? 'highlight-positive' : 'highlight-negative'}">$${interestSaved.toFixed(2)}</span></p>
+            `;
+        }
+
     </script>
 </body>
 </html>
